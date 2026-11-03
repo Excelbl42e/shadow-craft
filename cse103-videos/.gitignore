@@ -1,0 +1,4 @@
+node_modules
+remotion/node_modules
+parts/*/build/*_raw.mp4
+parts/*/out/scene_stills/
