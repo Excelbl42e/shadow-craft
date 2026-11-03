@@ -2,3 +2,7 @@ node_modules
 remotion/node_modules
 parts/*/build/*_raw.mp4
 parts/*/out/scene_stills/
+# Booklet content (PDF, extracted text, narration scripts, audio, renders) is kept local:
+# this repository is public. Remove these two lines to commit it once the owner agrees.
+source/
+parts/
