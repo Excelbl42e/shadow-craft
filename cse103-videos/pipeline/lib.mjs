@@ -107,9 +107,20 @@ export function expand(script) {
         kicker: isIntro ? 'CSE103 System Development · Marking-scheme booklet' : `Part ${script.part} · ${script.partTitle}`,
         id: isIntro ? '' : ch.id,
         title: ch.cardTitle || ch.title,
-        star: !!ch.star,
+        star: ch.star || 0,
+        chip: ch.chip,
+        starNote: ch.starNote,
       },
-      beats: [{say: ch.titleSay || `Section ${ch.id}: ${ch.spoken || ch.title}.${ch.star ? ' This one is starred.' : ''}`, show: 0}],
+      beats: [
+        {
+          say:
+            ch.titleSay ||
+            `Section ${ch.spoken_id || ch.id}: ${ch.spoken || ch.title}.` +
+              (ch.star === 2 ? ' This one has two stars.' : ch.star ? ' This one is starred.' : '') +
+              (ch.chip === 'OFF-SLIDE' ? ' The booklet marks it off-slide.' : ''),
+          show: 0,
+        },
+      ],
       isTitle: true,
     });
     for (const sc of ch.scenes) {

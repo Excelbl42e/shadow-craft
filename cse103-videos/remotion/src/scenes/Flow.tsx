@@ -114,6 +114,7 @@ export const Flow: React.FC<{scene: SceneT}> = ({scene}) => {
                     const ah = 20;
                     const arrow = `${x2},${y2} ${x2 - ah * Math.cos(ang - 0.42)},${y2 - ah * Math.sin(ang - 0.42)} ${x2 - ah * Math.cos(ang + 0.42)},${y2 - ah * Math.sin(ang + 0.42)}`;
                     const lab = e.labelAt ?? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
+                    const lw = Math.max(68, (e.label?.length ?? 0) * 15 + 26);
                     return (
                       <g key={e.id}>
                         <polyline
@@ -129,7 +130,7 @@ export const Flow: React.FC<{scene: SceneT}> = ({scene}) => {
                         {!e.noArrow && !e.dashed && p > 0.95 ? <polygon points={arrow} fill={col} /> : null}
                         {e.label ? (
                           <g opacity={p}>
-                            <rect x={lab[0] - 34} y={lab[1] - 20} width={68} height={40} rx={8} fill={isF ? C.accent : C.bg2} />
+                            <rect x={lab[0] - lw / 2} y={lab[1] - 20} width={lw} height={40} rx={8} fill={isF ? C.accent : C.bg2} />
                             <text
                               x={lab[0]}
                               y={lab[1] + 9}

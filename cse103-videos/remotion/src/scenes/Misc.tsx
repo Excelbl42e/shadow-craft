@@ -12,21 +12,25 @@ export const Title: React.FC<{scene: SceneT}> = ({scene}) => {
   const d = scene.data;
   const o = appear(frame, 0, 16);
   const bar = appear(frame, 6, 24);
+  const stars = typeof d.star === 'number' ? d.star : d.star ? 1 : 0;
   return (
     <div style={{position: 'absolute', inset: 0, fontFamily: FONT, color: C.text}}>
       <div style={{position: 'absolute', left: SIDE + 40, right: SIDE + 40, top: 300}}>
         <div style={{fontSize: 34, color: C.dim, fontWeight: 600, letterSpacing: 3, opacity: o}}>{d.kicker}</div>
         <div style={{display: 'flex', alignItems: 'baseline', gap: 40, marginTop: 16, opacity: o, transform: `translateY(${(1 - o) * 30}px)`}}>
-          {d.id ? <div style={{fontSize: 150, fontWeight: 800, color: C.learn, lineHeight: 1}}>{d.id}</div> : null}
+          {d.id ? <div style={{fontSize: 150, fontWeight: 800, color: C.learn, lineHeight: 1, whiteSpace: 'nowrap'}}>{d.id}</div> : null}
           <div style={{fontSize: d.id ? 64 : 80, fontWeight: 700, lineHeight: 1.15}}>
             {d.title}
-            {d.star ? <span style={{color: C.accent}}> ★</span> : null}
+            {stars ? <span style={{color: C.accent, whiteSpace: 'nowrap'}}> {'★'.repeat(stars)}</span> : null}
           </div>
         </div>
         <div style={{marginTop: 36, height: 8, width: `${bar * 100}%`, background: `linear-gradient(90deg, ${C.learn}, ${C.mark})`, borderRadius: 4}} />
-        {d.star ? (
-          <div style={{marginTop: 26, fontSize: 30, color: C.accent, opacity: appear(frame, 12)}}>★ appears in almost every paper</div>
-        ) : null}
+        <div style={{display: 'flex', gap: 24, alignItems: 'center', marginTop: 26, opacity: appear(frame, 12)}}>
+          {d.chip ? (
+            <div style={{border: `2px solid ${C.example}`, color: C.example, fontWeight: 800, fontSize: 26, letterSpacing: 1, padding: '6px 14px', borderRadius: 8}}>{d.chip}</div>
+          ) : null}
+          {stars ? <div style={{fontSize: 30, color: C.accent}}>{d.starNote || '★ appears in almost every paper'}</div> : null}
+        </div>
       </div>
     </div>
   );
@@ -123,41 +127,57 @@ export const Symbols: React.FC<{scene: SceneT}> = ({scene}) => {
 };
 
 // ---- Figure from the PDF ----------------------------------------------
+// Tall/normal figures sit left with notes on the right; wide figures sit on top with notes below.
 export const Figure: React.FC<{scene: SceneT}> = ({scene}) => {
   const frame = useCurrentFrame();
   const d = scene.data;
   const z = interpolate(frame, [0, scene.dur], [1, 1.04], {extrapolateRight: 'clamp'});
   const o = appear(frame, 0, 14);
+  const wide = d.w / d.h > 1.6;
+  const notes = (
+    <div style={{flex: 1, fontSize: 42, lineHeight: 1.4, display: 'flex', flexDirection: 'column', gap: 22}}>
+      {(d.notes as string[]).map((t, i) => {
+        const oo = appear(frame, revealFrame(scene.beats, i));
+        return (
+          <div key={i} style={{opacity: oo, transform: `scale(${0.95 + 0.05 * oo})`, transformOrigin: 'left center'}}>
+            <Rich text={t} />
+          </div>
+        );
+      })}
+    </div>
+  );
+  const img = (
+    <div
+      style={{
+        ...(wide ? {width: '100%'} : {height: '100%'}),
+        aspectRatio: `${d.w} / ${d.h}`,
+        background: '#fff',
+        borderRadius: 16,
+        padding: 14,
+        boxSizing: 'border-box',
+        opacity: o,
+        overflow: 'hidden',
+        flex: '0 0 auto',
+      }}
+    >
+      <Img src={staticFile(d.src)} style={{width: '100%', height: '100%', objectFit: 'contain', transform: `scale(${z})`}} />
+    </div>
+  );
   return (
     <SceneFrame scene={scene} fit={false} base={30}>
-      {() => (
-        <div style={{display: 'flex', gap: 60, height: '100%', alignItems: 'center'}}>
-          <div
-            style={{
-              height: '100%',
-              aspectRatio: `${d.w} / ${d.h}`,
-              background: '#fff',
-              borderRadius: 16,
-              padding: 14,
-              boxSizing: 'border-box',
-              opacity: o,
-              overflow: 'hidden',
-            }}
-          >
-            <Img src={staticFile(d.src)} style={{width: '100%', height: '100%', objectFit: 'contain', transform: `scale(${z})`}} />
+      {() =>
+        wide ? (
+          <div style={{display: 'flex', flexDirection: 'column', gap: 40, height: '100%'}}>
+            {img}
+            {notes}
           </div>
-          <div style={{flex: 1, fontSize: 42, lineHeight: 1.4, display: 'flex', flexDirection: 'column', gap: 22}}>
-            {(d.notes as string[]).map((t, i) => {
-              const oo = appear(frame, revealFrame(scene.beats, i));
-              return (
-                <div key={i} style={{opacity: oo, transform: `scale(${0.95 + 0.05 * oo})`, transformOrigin: 'left center'}}>
-                  <Rich text={t} />
-                </div>
-              );
-            })}
+        ) : (
+          <div style={{display: 'flex', gap: 60, height: '100%', alignItems: 'center'}}>
+            {img}
+            {notes}
           </div>
-        </div>
-      )}
+        )
+      }
     </SceneFrame>
   );
 };

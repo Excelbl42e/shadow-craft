@@ -112,7 +112,7 @@ for (const sc of scenes) {
   if (sc.chapter !== ci) {
     ci = sc.chapter;
     const ch = script.chapters[ci];
-    md += `\n## ${chapTitle(ch)}${ch.star ? ' ★' : ''}\n\n`;
+    md += `\n## ${chapTitle(ch)}${ch.star ? ' ' + '★'.repeat(ch.star === 2 ? 2 : 1) : ''}${ch.chip ? ' (' + ch.chip + ')' : ''}\n\n`;
   }
   if (!sc.isTitle) md += `**[${sc.kind}${sc.data.tag ? ' · ' + sc.data.tag : ''}] ${sc.data.heading ?? ''}**\n\n`;
   for (const b of sc.beats) md += `- ${toDisplay(b.say)}\n`;
